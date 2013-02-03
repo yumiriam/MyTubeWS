@@ -30,4 +30,5 @@ public class FileBean {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
 }

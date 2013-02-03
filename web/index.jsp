@@ -1,9 +1,3 @@
-<%-- 
-    Document   : index
-    Created on : Jan 25, 2013, 1:10:06 PM
-    Author     : miriam
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
