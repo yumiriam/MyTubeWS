@@ -1,9 +1,12 @@
 package com.milissa.ws;
 
+import com.milissa.appengine.Descricao;
+import com.milissa.appengine.AppEngineInterface;
+import com.milissa.rmiclient.InterfaceRMI;
+import com.milissa.rmiclient.RMIFileBean;
 import com.milissa.bean.FileBean;
 import com.milissa.corbaclient.IdServer;
 import com.milissa.corbaclient.IdServerHelper;
-import com.milissa.rmiclient.InterfaceRMI;
 import java.io.*;
 import javax.activation.DataHandler;
 import javax.jws.WebMethod;
@@ -29,10 +32,10 @@ import java.rmi.registry.Registry;
 public class VideoService {
 	
 	private static String RMI_HOST = "localhost";
-	private static String NAMESERVICE_HOST = "miriam-laptop:2809";
+	private static String CORBA_NAMESERVICE_HOST = "miriam-laptop:2809";
 
 	private static IdServer callCorbaServer() throws IOException {
-		String[] args = {"-ORBInitRef", "NameService=corbaloc::"+NAMESERVICE_HOST};
+		String[] args = {"-ORBInitRef", "NameService=corbaloc::"+CORBA_NAMESERVICE_HOST};
 
 		try {
 			// Create an object request broker
@@ -96,13 +99,13 @@ public class VideoService {
 
 			/* CORBA */
 			IdServer idserver = callCorbaServer();
-			String id = idserver.generateId(fileName);
+			String id = idserver.generateId(fileName.toUpperCase());
 
 			if (id != null) {
 				/* RMI */
 				try {
 					Registry registry = LocateRegistry.getRegistry(RMI_HOST);
-					InterfaceRMI stub = (InterfaceRMI) registry.lookup("MiLissaRMI");
+					InterfaceRMI stub = (InterfaceRMI) registry.lookup("InterfaceRMI");
 
 					ByteArrayOutputStream os = new ByteArrayOutputStream();
 					byte[] buffer = new byte[100000];
@@ -111,7 +114,7 @@ public class VideoService {
 						os.write(buffer, 0, bytesRead); 
 					}
 					
-					com.milissa.rmiclient.FileBean rmiFile = new com.milissa.rmiclient.FileBean();
+					RMIFileBean rmiFile = new RMIFileBean();
 					rmiFile.setName(file.getName());
 					rmiFile.setData(os.toByteArray());
 					
@@ -122,17 +125,20 @@ public class VideoService {
 
 					if (stub.saveFile(rmiFile, id)) {
 						/* App Engine */
-						// Coisa nova
+						Descricao desc = new Descricao();
+						desc.setId(id);
+						desc.setDescricao(file.getDescription());
+						AppEngineInterface descServer = new AppEngineInterface();
+						descServer.enviarArquivo(desc);
 						
 						return id;
 					}
 				} catch (Exception e) {
 					System.err.println("Client exception: " + e.toString());
-					e.printStackTrace();
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("IO exception: " + e.toString());
 		}
 		return null;
 	}
@@ -142,12 +148,13 @@ public class VideoService {
 		try {
 			/* CORBA */
 			IdServer idserver = callCorbaServer();
+			id = id.toUpperCase();
 			if (idserver.verifyId(id)) {
 				/* RMI */
 				Registry registry = LocateRegistry.getRegistry(RMI_HOST);
-				InterfaceRMI stub = (InterfaceRMI) registry.lookup("MiLissaRMI");
+				InterfaceRMI stub = (InterfaceRMI) registry.lookup("InterfaceRMI");
 				
-				com.milissa.rmiclient.FileBean rmiFile = stub.rescueFile(id);
+				RMIFileBean rmiFile = stub.rescueFile(id);
 				
 				if (rmiFile != null) {
 					FileBean downloadFile = new FileBean();
@@ -167,14 +174,16 @@ public class VideoService {
 					downloadFile.setData(handler);
 					
 					/* App Engine */
-					//downloadFile.setDescription();
+					AppEngineInterface descServer = new AppEngineInterface();
+					Descricao desc =  descServer.receberArquivo(id);
+					downloadFile.setDescription(desc.getDescricao());
 					
 					return downloadFile;
 				}
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println("Exception: " + e.toString());
 		}
 		return null;
 	}

@@ -2,12 +2,12 @@ package com.milissa.rmiclient;
 
 import java.io.Serializable;
 
-public class FileBean implements Serializable {
+public class RMIFileBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private byte[] data;
 	private String name;
     
-	public FileBean(){
+	public RMIFileBean(){
 
 	}
 
