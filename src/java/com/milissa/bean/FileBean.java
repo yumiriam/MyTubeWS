@@ -1,10 +1,10 @@
-package com.milissa.bean.bean;
+package com.milissa.bean;
 
 import javax.activation.DataHandler;
 
 public class FileBean {
 	private String name;
-	private String type;
+	private String description;
 	private DataHandler data;
 
 	public DataHandler getData() {
@@ -23,12 +23,12 @@ public class FileBean {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	
+
 }
