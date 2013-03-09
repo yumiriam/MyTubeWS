@@ -14,7 +14,7 @@ public class AppEngineInterface {
 				UnsupportedEncodingException{
 		
 		try {
-			URL url = new URL("http://localhost:8888/upload");
+			URL url = new URL("http://trabfinalsd.appspot.com/upload");
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
@@ -41,7 +41,7 @@ public class AppEngineInterface {
 	public Descricao receberArquivo(String getId) throws UnsupportedEncodingException{
 		Descricao desc = null;
 		try {
-			URL url = new URL("http://localhost:8888/server?get=" + getId);
+			URL url = new URL("http://trabfinalsd.appspot.com/server?get=" + getId);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setDoInput(true);
 			connection.setDoOutput(true);

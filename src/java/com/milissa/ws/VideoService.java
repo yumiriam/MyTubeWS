@@ -2,8 +2,6 @@ package com.milissa.ws;
 
 import com.milissa.appengine.Descricao;
 import com.milissa.appengine.AppEngineInterface;
-import com.milissa.rmiclient.InterfaceRMI;
-import com.milissa.rmiclient.RMIFileBean;
 import com.milissa.bean.FileBean;
 import com.milissa.corbaclient.IdServer;
 import com.milissa.corbaclient.IdServerHelper;
@@ -105,7 +103,7 @@ public class VideoService {
 				/* RMI */
 				try {
 					Registry registry = LocateRegistry.getRegistry(RMI_HOST);
-					InterfaceRMI stub = (InterfaceRMI) registry.lookup("InterfaceRMI");
+					teste.InterfaceRMI stub = (teste.InterfaceRMI) registry.lookup("InterfaceRMI");
 
 					ByteArrayOutputStream os = new ByteArrayOutputStream();
 					byte[] buffer = new byte[100000];
@@ -114,7 +112,7 @@ public class VideoService {
 						os.write(buffer, 0, bytesRead); 
 					}
 					
-					RMIFileBean rmiFile = new RMIFileBean();
+					teste.RMIFileBean rmiFile = new teste.RMIFileBean();
 					rmiFile.setName(file.getName());
 					rmiFile.setData(os.toByteArray());
 					
@@ -129,9 +127,8 @@ public class VideoService {
 						desc.setId(id);
 						desc.setDescricao(file.getDescription());
 						AppEngineInterface descServer = new AppEngineInterface();
-						descServer.enviarArquivo(desc);
-						
-						return id;
+						if (descServer.enviarArquivo(desc))					
+							return id;
 					}
 				} catch (Exception e) {
 					System.err.println("Client exception: " + e.toString());
@@ -152,9 +149,9 @@ public class VideoService {
 			if (idserver.verifyId(id)) {
 				/* RMI */
 				Registry registry = LocateRegistry.getRegistry(RMI_HOST);
-				InterfaceRMI stub = (InterfaceRMI) registry.lookup("InterfaceRMI");
+				teste.InterfaceRMI stub = (teste.InterfaceRMI) registry.lookup("InterfaceRMI");
 				
-				RMIFileBean rmiFile = stub.rescueFile(id);
+				teste.RMIFileBean rmiFile = stub.rescueFile(id);
 				
 				if (rmiFile != null) {
 					FileBean downloadFile = new FileBean();
